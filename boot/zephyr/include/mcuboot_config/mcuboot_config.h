@@ -9,6 +9,8 @@
 #ifndef __MCUBOOT_CONFIG_H__
 #define __MCUBOOT_CONFIG_H__
 
+#include <zephyr/devicetree.h>
+
 #ifdef CONFIG_BOOT_SIGNATURE_TYPE_RSA
 #define MCUBOOT_SIGN_RSA
 #  if (CONFIG_BOOT_SIGNATURE_TYPE_RSA_LEN != 2048 && \
@@ -229,6 +231,18 @@
 
 #else
 #define MCUBOOT_MAX_IMG_SECTORS       128
+#endif
+
+#if DT_HAS_CHOSEN(zephyr_flash)
+#if DT_PROP_OR(DT_CHOSEN(zephyr_flash), write_block_size, 0) > 8
+
+#ifdef MCUBOOT_BOOT_MAX_ALIGN
+#undef MCUBOOT_BOOT_MAX_ALIGN
+#endif
+
+#define MCUBOOT_BOOT_MAX_ALIGN DT_PROP(DT_CHOSEN(zephyr_flash), write_block_size)
+
+#endif
 #endif
 
 #if CONFIG_BOOT_WATCHDOG_FEED
